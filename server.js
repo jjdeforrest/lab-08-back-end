@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 3001;
 const GEOCODE_API_Key = process.env.GOOGLE_API_KEY;
 const superagent = require('superagent');
 app.use(cors());
+const pg = require('pg');
 
 // LOCATION DATA
 

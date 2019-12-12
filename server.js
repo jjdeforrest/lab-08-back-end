@@ -23,7 +23,7 @@ function FormattedData(query, location) {
 
 app.get('/location', (request, response) => {
   const searchQuery = request.query.data;
-  const urlToVisit = `https://maps.googleapis.com/maps/api/geocode/json?address=${searchQuery}&key=${process.env.GOOGLE_API_KEY}`;
+  const urlToVisit = `https://maps.googleapis.com/maps/api/geocode/json?address=${searchQuery}&key=${process.env.GEOCODING_API_KEY}`;
 
   superagent.get(urlToVisit).then(responseFromSuper => {
     //console.log('stuff', responseFromSuper.body);
@@ -51,7 +51,7 @@ function WeatherGetter(weatherValue) {
 app.get('/weather', (request, response) => {
   const weather_query = request.query.data
 
-  const urlToVisit = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${weather_query.latitude},${weather_query.longitude}`;
+  const urlToVisit = `https://api.darksky.net/forecast/${process.env.darksky}/${weather_query.latitude},${weather_query.longitude}`;
   superagent.get(urlToVisit).then(responseFromSuper => {
     //console.log('stuff', responseFromSuper.body);
     const darkskyData = responseFromSuper.body;
@@ -77,7 +77,7 @@ function Eventbrite(eventObj) {
 }
 app.get('/events', (request, response) => {
   const event_query = request.query.data
-  const urlToVisit = `https://www.eventbriteapi.com/v3/events/search?location.longitude=${event_query.longitude}&location.latitude=${event_query.latitude}&token=${process.env.EVENT_API_KEY}`;
+  const urlToVisit = `https://www.eventbriteapi.com/v3/events/search?location.longitude=${event_query.longitude}&location.latitude=${event_query.latitude}&token=${process.env.eventbrite}`;
   // console.log(urlToVisit);
   superagent.get(urlToVisit).then(responseFromSuper => {
     // console.log('things', responseFromSuper.body.events[0])

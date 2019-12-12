@@ -1,10 +1,10 @@
 CREATE TABLE people(
-id: joshudef,
-first_name: VARCHAR(255),
-last_name: VARCHAR(255),
-ssn: INTEGER NOT NULL,
-ninja_status: BOOLEAN NOT NULL,
-biography: TEXT
+id SERIAL PRIMARY KEY,
+first_name VARCHAR(255),
+last_name VARCHAR(255),
+ssn INTEGER NOT NULL,
+ninja_status BOOLEAN NOT NULL,
+biography TEXT
 );
 
 DROP TABLE IF EXISTS locations;

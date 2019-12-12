@@ -44,7 +44,7 @@ function Event (link, name, event_date, summary){
 // TARGET LOCATION from API 
 
 app.get('/location', (request, response) => {
-  const searchQuery = request.query.data; //request.query is part of the request (NewJohn's hand) and is a vector for questions. It lives in the URL, public info. Postal service of internet.
+  const searchQuery = request.query.data; 
 
   client.query(`SELECT * FROM locations WHERE search_query=$1`, [searchQuery]).then(sqlResult => {
 

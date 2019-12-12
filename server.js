@@ -7,9 +7,13 @@ const cors = require('cors');
 require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
-const GEOCODE_API_Key = process.env.GOOGLE_API_KEY;
 const superagent = require('superagent');
 app.use(cors());
+const pg = require('pg');
+
+const client = new pg.Client(process.env.DATABASE_URL);
+client.connect();
+client.on('error', (error) => console.error(error));
 
 // LOCATION DATA
 
@@ -22,7 +26,7 @@ function FormattedData(query, location) {
 }
 
 app.get('/location', (request, response) => {
-  const searchQuery = request.query.data;
+  const search_query = request.query.data;
   const urlToVisit = `https://maps.googleapis.com/maps/api/geocode/json?address=${searchQuery}&key=${process.env.GEOCODING_API_KEY}`;
 
   superagent.get(urlToVisit).then(responseFromSuper => {

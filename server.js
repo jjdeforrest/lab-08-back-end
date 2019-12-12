@@ -12,6 +12,10 @@ const superagent = require('superagent');
 app.use(cors());
 const pg = require('pg');
 
+const client = new pg.Client(process.env.DATABASE_URL);
+client.connect();
+client.on('error', (error) => console.error(error));
+
 // LOCATION DATA
 
 function FormattedData(query, location) {

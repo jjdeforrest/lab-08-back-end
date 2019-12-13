@@ -25,14 +25,5 @@
   "bugs": {
     "url": "https://github.com/jjdeforrest/lab-08-back-end/issues"
   },
-
-  "homepage": "https://github.com/jjdeforrest/lab-08-back-end#readme",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "pg": "^7.14.0",
-    "psql": "0.0.1",
-    "superagent": "^5.1.2"
-  }
-
+  "homepage": "https://github.com/jjdeforrest/lab-08-back-end#readme"
+}

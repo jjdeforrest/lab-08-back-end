@@ -16,6 +16,7 @@ client.on('error', (error) => console.error(error));
 
 const PORT = process.env.PORT;
 
+
 // Constructor Functions
 
 //location
@@ -43,6 +44,7 @@ function Event(link, name, event_date, summary) {
 // TARGET LOCATION from API
 
 app.get('/location', (request, response) => {
+
   const searchQuery = request.query.data;
 
   client.query(`SELECT * FROM locations WHERE search_query=$1`, [searchQuery]).then(sqlResult => {
@@ -101,6 +103,7 @@ function Weather(forecast, time) {
 app.get('/weather', getWeather)
 
 function getWeather(request, response) {
+
   const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.query.data.latitude},${request.query.data.longitude}`;
   superagent.get(url).then(data => {
     
@@ -113,6 +116,7 @@ function getWeather(request, response) {
   }).catch(err => {
     console.error(err);
     response.status(500).send('Status 500: Internal Server Error');
+
   });
 }
 
@@ -140,6 +144,32 @@ function getEvents(request, response) {
         response.send(formattedEvents);
 
 
+
+// EVENTBRITE from API 
+
+app.get('/events', getEvents)
+
+function getEvents(request, response){
+
+  let eventData = request.query.data;
+
+  
+  client.query(`SELECT * FROM events WHERE search_query=$1`, [eventData.search_query]).then(sqlResult => {
+
+    if(sqlResult.rowCount === 0){
+      console.log('data from internet');
+
+      const urlfromEventbrite = `https://www.eventbriteapi.com/v3/events/search/?sort_by=date&location.latitude=${eventData.latitude}&location.longitude=${eventData.longitude}&token=${process.env.EVENTBRITE_API_KEY}`;
+
+      superagent.get(urlfromEventbrite).then(responseFromSuper => {
+        
+    
+        const eventbriteData = responseFromSuper.body.events;
+        const formattedEvents = eventbriteData.map(event => new Event(event.url, event.name.text, event.start.local, event.description.text));
+  
+        response.send(formattedEvents);
+
+        
         formattedEvents.forEach(event => {
           const insertEvent = `
           INSERT INTO events

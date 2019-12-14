@@ -1,5 +1,5 @@
 {
-  "globals" : {
+  "globals": {
     "Handlebars": true,
     "$": true
   },
@@ -15,16 +15,40 @@
     "jest": true
   },
   "rules": {
-    "eqeqeq": ["error", "always"],
+    "eqeqeq": [
+      "error",
+      "always"
+    ],
     "no-template-curly-in-string": "error",
     "no-console": "off",
     "no-undefined": "off",
-    "indent": ["error", 2],
-    "quotes": ["warn", "single", {"allowTemplateLiterals": true}],
-    "no-multi-spaces": ["warn", {"exceptions": { "VariableDeclarator": true }}],
+    "indent": [
+      "error",
+      2
+    ],
+    "quotes": [
+      "warn",
+      "single",
+      {
+        "allowTemplateLiterals": true
+      }
+    ],
+    "no-multi-spaces": [
+      "warn",
+      {
+        "exceptions": {
+          "VariableDeclarator": true
+        }
+      }
+    ],
     "no-trailing-spaces": "warn",
     "new-cap": "warn",
-    "no-redeclare": ["error", { "builtinGlobals": true }],
+    "no-redeclare": [
+      "error",
+      {
+        "builtinGlobals": true
+      }
+    ],
     "eol-last": "error"
   }
 }

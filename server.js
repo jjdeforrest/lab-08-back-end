@@ -16,6 +16,7 @@ client.on("error", error => console.error(error));
 
 const PORT = process.env.PORT;
 
+
 // Constructor Functions
 
 //location
@@ -42,7 +43,9 @@ function Event(link, name, event_date, summary) {
 
 // TARGET LOCATION from API
 
+
 app.get("/location", (request, response) => {
+
   const searchQuery = request.query.data;
 
   client
@@ -101,6 +104,7 @@ function Weather(forecast, time) {
 app.get("/weather", getWeather);
 
 function getWeather(request, response) {
+
   const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.query.data.latitude},${request.query.data.longitude}`;
   superagent
     .get(url)
@@ -112,6 +116,7 @@ function getWeather(request, response) {
       });
       response.status(200).send(weather);
     })
+
     .catch(err => {
       console.error(err);
       response.status(500).send("Status 500: Internal Server Error");
@@ -124,6 +129,7 @@ app.get("/events", getEvents);
 
 function getEvents(request, response) {
   let eventData = request.query.data;
+
 
   client
     .query(`SELECT * FROM events WHERE search_query=$1`, [
@@ -150,6 +156,7 @@ function getEvents(request, response) {
 
             formattedEvents.forEach(event => {
               const insertEvent = `
+
           INSERT INTO events
           (name, search_query, link, event_date, summary)
           VALUE

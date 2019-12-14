@@ -41,7 +41,7 @@ function Event(link, name, event_date, summary) {
   this.summary = summary;
 }
 
-// TARGET LOCATION from API 
+// TARGET LOCATION from API
 
 app.get('/location', (request, response) => {
 
@@ -51,18 +51,17 @@ app.get('/location', (request, response) => {
 
     //if stuff:
     if (sqlResult.rowCount > 0) {
-      console.log('Found data in database')
       response.send(sqlResult.rows[0]);
     } else {
 
-      console.log('nothing found in database, asking google')
+
       const urlToVisit = `https://maps.googleapis.com/maps/api/geocode/json?address=${searchQuery}&key=${process.env.GEOCODE_API_KEY}`;
 
       superagent.get(urlToVisit).then(responseFromSuper => {
 
         const geoData = responseFromSuper.body;
         const specificGeoData = geoData.results[0];
-        console.log(geoData);
+      
         const formatted = specificGeoData.formatted_address;
 
         const lat = specificGeoData.geometry.location.lat;
@@ -94,59 +93,35 @@ app.get('/location', (request, response) => {
 })
 
 
-// TARGET WEATHER from API 
+// TARGET WEATHER from API
+
+function Weather(forecast, time) {
+  this.forecast = forecast;
+  this.time = time;
+}
 
 app.get('/weather', getWeather)
 
 function getWeather(request, response) {
 
-  const localData = request.query.data;
+  const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.query.data.latitude},${request.query.data.longitude}`;
+  superagent.get(url).then(data => {
+    
+    const weatherData = data.body.daily.data.map(obj => {
+      let forecast = obj.summary;
+      let formattedTime = new Date(obj.time * 1000).toDateString();
+      return new Weather(forecast, formattedTime);
+    })
+    response.status(200).send(weatherData);
+  }).catch(err => {
+    console.error(err);
+    response.status(500).send('Status 500: Internal Server Error');
 
-
-  client.query(`SELECT * FROM weather WHERE search_query=$1`, [localData.search_query]).then(sqlResult => {
-
-
-    if (sqlResult.rowCount > 0) {
-      console.log('found weather stuff in database')
-
-      response.send(sqlResult.rows[0]);
-      console.log(sqlResult.rows);
-
-    } else {
-      console.log('did not find in database, googling now!');
-
-      const urlDarkSky = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${localData.latitude},${localData.longitude}`;
-
-
-
-      superagent.get(urlDarkSky).then(responseFromSuper => {
-
-        const weatherData = responseFromSuper.body;
-        const eightDays = weatherData.daily.data;
-        const formattedDays = eightDays.map(day => new Day(day.summary, day.time));
-        formattedDays.forEach(day => {
-
-          const sqlQueryInsert = `INSERT INTO weather
-      (search_query, forecast, time)
-      VALUES
-      ($1, $2, $3)`;
-
-          const valuesArray = [localData.search_query, day.forecast, day.time];
-          client.query(sqlQueryInsert, valuesArray);
-          console.log('accessing values array', valuesArray);
-        })
-
-        response.send(formattedDays)
-      }).catch(error => {
-        response.status(500).send(error.message);
-        console.error(error);
-      })
-    }
   });
 }
 
 
-// EVENTBRITE from API 
+// EVENTBRITE from API
 
 app.get('/events', getEvents)
 
@@ -158,17 +133,13 @@ function getEvents(request, response) {
   client.query(`SELECT * FROM events WHERE search_query=$1`, [eventData.search_query]).then(sqlResult => {
 
     if (sqlResult.rowCount === 0) {
-      console.log('data from internet');
+
 
       const urlfromEventbrite = `http://api.eventful.com/json/events/search?location=${eventData.formatted_query}&date=Future&app_key=${process.env.EVENTBRITE_API_KEY}`;
-      console.log(urlfromEventbrite)
       superagent.get(urlfromEventbrite).then(responseFromSuper => {
 
-        //console.log('message=============================',responseFromSuper.body)
-        //const eventbriteData = responseFromSuper.body.events;
-        const eventbriteData = responseFromSuper.res.text;
-        console.log('hello', eventbriteData)
-        const formattedEvents = eventbriteData.map(event => new Event(event.url, event.name.text, event.start.local, event.description.text));
+        const eventbriteData = JSON.parse(responseFromSuper.text);
+        const formattedEvents = eventbriteData.events.event.map(event => new Event(event.url, event.title, event.start_time, event.description));
 
         response.send(formattedEvents);
 
@@ -214,8 +185,6 @@ function getEvents(request, response){
       })
 
     } else {
-      console.log('data already exists in event database');
-      'use the data that exists in the db';
       response.send(sqlResult.rows);
     }
   });
